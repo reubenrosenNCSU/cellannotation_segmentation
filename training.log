@@ -1,0 +1,201 @@
+2025-07-03 12:35:41,390 - INFO - ===== STARTING TRAINING PROCESS =====
+2025-07-03 12:35:41,390 - DEBUG - User ID: 98a58bcf-0520-409e-b12c-32ad7638dc6b
+2025-07-03 12:35:41,390 - DEBUG - Snapshot dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/snapshots
+2025-07-03 12:35:41,390 - DEBUG - Saved data dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/saved_data
+2025-07-03 12:35:41,390 - DEBUG - Saved annot dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/saved_annotations
+2025-07-03 12:35:41,390 - INFO - Parsing input parameters
+2025-07-03 12:35:41,390 - DEBUG - Num images: 0
+2025-07-03 12:35:41,390 - DEBUG - Model type: SGN
+2025-07-03 12:35:41,391 - DEBUG - Epochs: 10
+2025-07-03 12:35:41,391 - INFO - Setting up class mapping
+2025-07-03 12:35:41,391 - DEBUG - Class map: {'SGN': 0}
+2025-07-03 12:35:41,391 - DEBUG - Pretrain dir: pre_train_SGN
+2025-07-03 12:35:41,391 - DEBUG - Weights file: snapshots/SGN_best.pt
+2025-07-03 12:35:41,391 - DEBUG - Pre-annot path: pre_train_SGN/pre_annot.csv
+2025-07-03 12:35:41,391 - INFO - Collecting available data
+2025-07-03 12:35:41,391 - DEBUG - Scanning user-saved images
+2025-07-03 12:35:41,391 - INFO - Found 0 user images with annotations
+2025-07-03 12:35:41,391 - INFO - Total images available: 0
+2025-07-03 12:35:41,391 - ERROR - Need at least 5 annotated images for training. Found: 0
+2025-07-03 12:35:41,391 - INFO - 10.80.24.12 - - [03/Jul/2025 12:35:41] "[31m[1mPOST /train-saved HTTP/1.1[0m" 400 -
+2025-07-03 12:35:54,245 - INFO - 10.80.24.12 - - [03/Jul/2025 12:35:54] "[36mGET /static/index.html HTTP/1.1[0m" 304 -
+2025-07-03 12:35:54,248 - INFO - 10.80.24.12 - - [03/Jul/2025 12:35:54] "POST /cleanup HTTP/1.1" 200 -
+2025-07-03 12:35:54,296 - INFO - 10.80.24.12 - - [03/Jul/2025 12:35:54] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-03 12:36:33,993 - INFO - ===== STARTING TRAINING PROCESS =====
+2025-07-03 12:36:33,993 - DEBUG - User ID: 98a58bcf-0520-409e-b12c-32ad7638dc6b
+2025-07-03 12:36:33,993 - DEBUG - Snapshot dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/snapshots
+2025-07-03 12:36:33,993 - DEBUG - Saved data dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/saved_data
+2025-07-03 12:36:33,993 - DEBUG - Saved annot dir: users/98a58bcf-0520-409e-b12c-32ad7638dc6b/saved_annotations
+2025-07-03 12:36:33,993 - INFO - Parsing input parameters
+2025-07-03 12:36:33,994 - DEBUG - Num images: 4
+2025-07-03 12:36:33,994 - DEBUG - Model type: SGN
+2025-07-03 12:36:33,994 - DEBUG - Epochs: 10
+2025-07-03 12:36:33,994 - INFO - Setting up class mapping
+2025-07-03 12:36:33,994 - DEBUG - Class map: {'SGN': 0}
+2025-07-03 12:36:33,994 - DEBUG - Pretrain dir: pre_train_SGN
+2025-07-03 12:36:33,994 - DEBUG - Weights file: snapshots/SGN_best.pt
+2025-07-03 12:36:33,994 - DEBUG - Pre-annot path: pre_train_SGN/pre_annot.csv
+2025-07-03 12:36:33,994 - INFO - Loading pre-train annotations for 4 images
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3584_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3584_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3584_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z055_3584_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,994 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z070_3840_4608.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 300100_234900_311500_auto_Z098_1024_2560_s_20.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_1024_0512.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,995 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 11-35-51_sg29L 4x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0434.ome_0512_1024.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for sgn-train-20231006/14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - DEBUG - Added annotation for 14-08-04_sg30L 5x dyn 647 568 488 R3 0_149_UltraII_C01_xyz-Table Z0540.ome_0000_0000_s_07.tif: SGN
+2025-07-03 12:36:33,996 - INFO - Loaded 8 files from pre_annot.csv
+2025-07-03 12:36:33,996 - INFO - Collecting available data
+2025-07-03 12:36:33,996 - DEBUG - Scanning user-saved images
+2025-07-03 12:36:33,996 - INFO - Found 0 user images with annotations
+2025-07-03 12:36:33,996 - DEBUG - Scanning pre-imported images
+2025-07-03 12:36:33,996 - INFO - Selected 4 pre-imported images
+2025-07-03 12:36:33,996 - INFO - Total images available: 4
+2025-07-03 12:36:33,996 - ERROR - Need at least 5 annotated images for training. Found: 4
+2025-07-03 12:36:33,997 - INFO - 10.80.24.12 - - [03/Jul/2025 12:36:33] "[31m[1mPOST /train-saved HTTP/1.1[0m" 400 -
+2025-07-03 12:37:34,222 - INFO -  * Detected change in '/home/greenbaumgpu/Reuben/tool/app.py', reloading
+2025-07-03 12:37:34,223 - INFO - Scheduler has been shut down
+2025-07-03 12:37:34,223 - DEBUG - Looking for jobs to run
+2025-07-03 12:37:34,223 - DEBUG - No jobs; waiting until a job is added

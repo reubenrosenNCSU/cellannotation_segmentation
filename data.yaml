@@ -1,0 +1,4 @@
+train: /home/greenbaumgpu/Fengyi/YOLO/datasets/MADM2/images/train
+val: /home/greenbaumgpu/Fengyi/YOLO/datasets/MADM2/images/val
+test: /home/greenbaumgpu/Fengyi/YOLO/datasets/MADM2/images/test
+nc: 6
