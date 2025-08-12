@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image Annotation Tool v2</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tiff.js@1.0.0/tiff.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Use flexbox layout */
+    height: 100vh;
+    overflow: hidden; /* Prevent double scrollbars */
+        }
+        .tooltip {
+    position: relative;
+    display: inline-block;
+}
+.threshold-input-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin: 5px 0;
+}
+
+/* Make button and input equal heights */
+.threshold-input-group .threshold-input,
+.threshold-input-group .btn {
+    height: 40px;
+    flex: 1; /* Equal width distribution */
+}
+.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.tooltip:hover::before {
+    opacity: 1;
+}
+        .toolbar {
+    width: 220px;
+    background-color: #f4f4f4;
+    padding: 15px;
+    overflow-y: auto;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.threshold-input {
+    padding: 8px 12px; /* Match button padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px; /* Match button text size */
+    width: 120px; /* Fixed width for both inputs */
+    height: 40px; /* Match button height */
+    box-sizing: border-box; /* Include padding in width */
+}
+    .slider-container {
+        margin: 15px 0;
+    }
+    
+    .slider {
+        flex: 1; /* Makes slider take up remaining space between threshold inputs */
+    }
+.canvas-container {
+    flex-grow: 1;
+    overflow: auto;
+    background-color: #f4f4f4; /* Match toolbar background */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cell-count {
+    margin: 10px 0;
+    padding: 8px;
+    background: #e8e8e8;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.model-group {
+    border: 2px solid #4CAF50;
+    border-radius: 6px;
+    padding: 10px;
+    margin: 10px 0;
+    background: #f8fff8;
+}
+
+.model-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: #666;
+    font-weight: bold;
+}
+
+canvas {
+    cursor: crosshair;
+    touch-action: none;
+    display: none; /* Hide by default */
+    background-color: #f4f4f4; /* Match container */
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* Remove all max-width/max-height constraints */
+
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            height: 40px; /* Explicit height to match */
+            box-sizing: border-box; /* Consistent sizing */
+            padding: 8px 12px; /* Match input padding */
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn.active {
+            background: #2196F3;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider {
+            width: 100%;
+            margin: 5px 0;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        input[type="number"] {
+    font-family: Arial, sans-serif; /* Match button font */
+    -moz-appearance: textfield; /* Remove spin buttons in Firefox */
+}
+
+/* Remove spin buttons in Chrome/Safari */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.color-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.color-picker label {
+    flex: 1;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.color-picker input[type="color"] {
+    width: 40px;
+    height: 30px;
+    padding: 2px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#color-picker-dropdown {
+        position: absolute;
+        left: 15px;
+        top: 40px;
+        background: #f4f4f4;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .color-picker {
+        margin: 5px 0;
+    }
+    
+    #color-toggle-btn.active {
+        background: #2196F3;
+    }
+    #metrics-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 2000;
+        display: none;
+}
+
+
+#charts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 25px;
+        padding: 10px;
+}
+/* Add placeholder text */
+.canvas-container::before {
+    content: "Upload an image to begin annotation";
+    color: #999;
+    font-style: italic;
+    position: absolute;
+    z-index: 1;
+}
+.canvas-container.has-image::before {
+    display: none;
+}
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <h3>Annotation and Detection Tool v2</h3>
+        <div id="current-image-display" style="margin: 5px 0; font-size: 0.9em; color: #667;"></div>
+        
+        <input type="file" id="image-input" accept=".tiff,.tif">
+        <button class="btn tooltip" data-tooltip="Load an .tif/.tiff file into the tool" id="load-image-btn">Load Image</button>
+        <button class="btn" id="batch-btn">Batch Detect</button>
+        <div class="slider-container">
+            <label>Class:</label>
+            <select id="class-select" class="btn">
+                <option value="0">SGN</option>
+                <option value="1">yellow neuron</option>
+                <option value="2">yellow astrocyte</option>
+                <option value="3">green neuron</option>
+                <option value="4">green astrocyte</option>
+                <option value="5">red neuron</option>
+                <option value="6">red astrocyte</option>
+                <option value="7">CD3</option> 
+            </select>
+        </div>
+        <button class="btn tooltip" id="color-toggle-btn" data-tooltip="Toggle class color pickers">
+            Class Colors
+        </button>
+        <div id="color-picker-dropdown" style="display: none;">
+            <div id="color-picker-container"></div>
+        </div>
+
+        <button class="btn tooltip" data-tooltip="Select Region of Interest (ROI)" id="crop-btn">Crop Image</button>
+        <button class="btn tooltip" data-tooltip="Toggle on/off zoom mode" id="zoom-btn">Toggle Zoom</button>
+        <button class="btn" id="complete-polygon-btn">Complete Polygon</button>
+        <button class="btn" id="cancel-polygon-btn">Cancel Polygon</button>
+        
+        <div class="slider-container">
+            <label>Brightness:</label>
+            <div style="display: flex; gap: 5px; margin: 5px 0;">
+                <input type="number" id="brightness-min" class="threshold-input" 
+                       value="-100" step="1" style="width: 60px;">
+                <input type="range" id="brightness" class="slider" min="-100" max="100" value="0">
+                <input type="number" id="brightness-max" class="threshold-input" 
+                       value="100" step="1" style="width: 60px;">
+            </div>
+        </div>
+        
+        <div class="slider-container">
+            <label>Contrast:</label>
+            <div style="display: flex; gap: 5px; margin: 5px 0;">
+                <input type="number" id="contrast-min" class="threshold-input" 
+                       value="-100" step="1" style="width: 60px;">
+                <input type="range" id="contrast" class="slider" min="-100" max="100" value="0">
+                <input type="number" id="contrast-max" class="threshold-input" 
+                       value="100" step="1" style="width: 60px;">
+            </div>
+        </div>
+        <div class="slider-container">
+            <label>Typical Cell Diameter (px):</label>
+            <div class="threshold-input-group">
+                <input type="number" id="cell-diameter" class="threshold-input" 
+                       value="34" step="1">
+                <button class="btn tooltip" data-tooltip="Scale image to optimize detection" 
+                        id="scale-btn">Scale</button>
+            </div>
+        </div>
+        <div class="cell-count">
+            Detected Cell Diameter: <span id="cell-diameter-display">0</span> px
+        </div>
+        <div class="cell-count">
+            Last Annotated Diameter: <span id="last-annotated-diameter">0</span> px
+        </div>
+        <div class="slider-container">
+            <label>Detection Threshold:</label>
+            <div class="threshold-input-group">
+                <input type="number" id="detection-threshold" class="threshold-input" 
+                       value="0.5" step="0.1" min="0" max="1">
+                <button class="btn tooltip" data-tooltip="Set confidence threshold for detection" 
+                        id="set-threshold-btn">Set</button>
+            </div>
+        </div>
+
+        <button class="btn tooltip" data-tooltip="Remove all annotations" id="clear-annotations-btn" style="background-color: red;">Clear Annotations</button>
+        <button class="btn tooltip" data-tooltip="Export Tiff+CSV file" id="export-annotations-btn">Export Image and Annotations</button>
+        <button class="btn tooltip" data-tooltip="Import (.csv)" id="import-annotations-btn">Import Annotations</button>
+        <div style="margin-top: 20px;">
+            <div>Imported Cells: <span id="imported-cell-count">0</span></div>
+            <div>Current Cells: <span id="current-cell-count">0</span></div>
+        </div>
+        <button class="btn tooltip" data-tooltip="Detect SGN cells" id="detect-sgn-btn">Detect SGN</button>
+        <button class="btn tooltip" data-tooltip="Detect CD3 cells" id="detect-cd3-btn">Detect CD3</button>
+        <button class="btn tooltip" data-tooltip="Detect MADM cells" id="detect-madm-btn">Detect MADM</button>
+        <button class="btn tooltip" data-tooltip="Save as PNG" id="save-image-btn">Save Image</button>
+        <button class="btn tooltip" data-tooltip="Use this before retraining on saved data" id="clear-training-data-btn" style="background-color: red;"> Clear Training Data</button>
+        <button class="btn tooltip" data-tooltip="Save data for retraining" id="save-training-data-btn">Save Training Data</button>
+        <button class="btn tooltip" data-tooltip="Upload data to retrain" id="fine-tune-btn">Fine-tune (Custom)</button>
+        <button class="btn tooltip" data-tooltip="Retrain on saved data" id="fine-tune-saved-btn">Fine-tune (Saved Data)</button>
+        <button id="show-metrics-btn">Show Training Metrics</button>
+        <div class="model-group">
+            <label>Select Model Type:</label>
+            <select id="model-type-select" class="btn">
+                <option value="SGN">SGN Model</option>
+                <option value="MADM">MADM Model</option>
+            </select>
+            <button class="btn tooltip" 
+                    data-tooltip="Use latest trained model" 
+                    id="detect-finetuned-btn">
+                Detect with Fine-tuned Model
+            </button>
+        </div>
+        <button class="btn tooltip" data-tooltip="Load image and test with a custom model" id="custom-detect-btn">Custom Detect</button>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+
+const colorToggleBtn = document.getElementById('color-toggle-btn');
+    const colorDropdown = document.getElementById('color-picker-dropdown');
+    
+    colorToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = colorDropdown.style.display === 'block';
+        colorDropdown.style.display = isVisible ? 'none' : 'block';
+        colorToggleBtn.classList.toggle('active', !isVisible);
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!colorDropdown.contains(e.target) && e.target !== colorToggleBtn) {
+            colorDropdown.style.display = 'none';
+            colorToggleBtn.classList.remove('active');
+        }
+    });
+        window.addEventListener('beforeunload', function(e) {
+            const data = new URLSearchParams();
+            data.append('dummy', '1'); // SendBeacon requires content
+            navigator.sendBeacon('/cleanup', data);
+        });
+
+        window.addEventListener('pagehide', function(e) {
+            axios.post('/cleanup', {}, { withCredentials: true });
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const CLASS_NAMES = [
+            'SGN', 
+            'yellow neuron', 
+            'yellow astrocyte',
+            'green neuron', 
+            'green astrocyte', 
+            'red neuron',   
+            'red astrocyte',
+            'CD3'   
+        ];
+        const colorContainer = document.getElementById('color-picker-container');
+        const DEFAULT_COLORS = [
+        '#E7FF6D', // SGN
+        '#66CCFF', // yellow neuron
+        '#0033FF', // yellow astrocyte
+        '#7A2222', // green neuron
+        '#FF3B22', // green astrocyte
+        '#FF66FF', // red neuron
+        '#660066',  // red astrocyte
+        '#00FF00'  // CD3 (Choose any)
+        ];
+
+        CLASS_NAMES.forEach((className, index) => {
+            const div = document.createElement('div');
+            div.className = 'color-picker';
+            
+            const label = document.createElement('label');
+            label.textContent = className;
+            
+            const input = document.createElement('input');
+            input.type = 'color';
+            input.value = DEFAULT_COLORS[index];
+            input.dataset.classIndex = index;
+            
+            div.appendChild(label);
+            div.appendChild(input);
+            colorContainer.appendChild(div);
+        });
+
+        // Function to get current color for a class
+        function getClassColor(classIndex) {
+            return document.querySelector(
+                `input[data-class-index="${classIndex}"]`
+            ).value;
+        }
+
+
+            // State Management
+            let state = {
+                image: null,
+                annotations: [], // Now stores polygons instead of boxes
+                currentPolygon: null, // Track polygon being drawn
+                editingPolygon: null, // Track polygon being edited (null when not editing)
+                scale: 1,
+                offsetX: 0,
+                offsetY: 0,
+                isDrawing: false,
+                isCropping: false,
+                isCropStarted: false, // New flag to track if cropping has begun
+                isZoomMode: false,
+                currentClass: 0,
+                cropStart: null,
+                panStart: null,
+                imageName: 'image.tiff',
+                naturalSize: { width: 0, height: 0 }
+            };
+            var overlap_factor = 0.1;
+            // DOM Elements
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const classSelect = document.getElementById('class-select');
+            const loadImageBtn = document.getElementById('load-image-btn');
+            const imageInput = document.getElementById('image-input');
+            const importedCellCount = document.getElementById('imported-cell-count');
+            const currentCellCount = document.getElementById('current-cell-count');
+            const brightness = document.getElementById('brightness');
+            const brightnessMin = document.getElementById('brightness-min');
+            const brightnessMax = document.getElementById('brightness-max');
+            const contrast = document.getElementById('contrast');
+            const contrastMin = document.getElementById('contrast-min');
+            const contrastMax = document.getElementById('contrast-max');
+
+            // Event Listeners
+            loadImageBtn.addEventListener('click', () => imageInput.click());
+            imageInput.addEventListener('change', handleImageUpload);
+            classSelect.addEventListener('change', e => state.currentClass = +e.target.value);
+            document.getElementById('crop-btn').addEventListener('click', toggleCropping);
+            document.getElementById('zoom-btn').addEventListener('click', toggleZoom);
+            document.getElementById('export-annotations-btn').addEventListener('click', exportAnnotations);
+            document.getElementById('import-annotations-btn').addEventListener('click', importAnnotations);
+            document.getElementById('clear-annotations-btn').addEventListener('click', clearAnnotations);
+            document.getElementById('save-image-btn').addEventListener('click', saveImage);
+            brightness.addEventListener('input', redraw);
+            contrast.addEventListener('input', redraw);
+            brightnessMin.addEventListener('change', updateBrightnessRange);
+            brightnessMax.addEventListener('change', updateBrightnessRange);
+            contrastMin.addEventListener('change', updateContrastRange);
+            contrastMax.addEventListener('change', updateContrastRange);
+            document.addEventListener('keydown', handleKeyPress);
+
+            // Canvas Events
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('wheel', handleWheel);
+            canvas.addEventListener('contextmenu', handleRightClick);
+
+            document.getElementById('fine-tune-saved-btn').addEventListener('click', () => {
+            document.getElementById('saved-train-modal').style.display = 'block';
+        });
+        function handleKeyPress(e) {
+    if (e.keyCode === 27) { // ESC key
+        // Toggle zoom mode instead of just turning it off
+        state.isZoomMode = !state.isZoomMode;
+        document.getElementById('zoom-btn').classList.toggle('active', state.isZoomMode);
+        redraw(); // Update canvas display
+        e.preventDefault(); // Prevent default browser behavior
+    }
+}
+function importAnnotations() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.txt';
+    fileInput.onchange = async () => {
+        const file = fileInput.files[0];
+        if (!file || !state.image) {
+            alert("No file or image loaded.");
+            return;
+        }
+
+        const width = state.image.width;
+        const height = state.image.height;
+        const text = await file.text();
+
+        const lines = text.split('\n').filter(line => line.trim().length > 0);
+        const annotations = [];
+
+        for (const line of lines) {
+            const parts = line.trim().split(' ');
+            if (parts.length < 3 || parts.length % 2 === 0) continue;
+
+            const classId = parseInt(parts[0]);
+            const coords = parts.slice(1).map(Number);
+
+            const points = [];
+            for (let i = 0; i < coords.length; i += 2) {
+                const x = coords[i] * width;
+                const y = coords[i + 1] * height;
+                // FIX: Store as object instead of array
+                points.push({x, y});  // Changed from [x, y]
+            }
+
+            annotations.push({ class: classId, points, isDetected: true });
+        }
+
+        state.annotations = annotations;
+        updateCellCounts(state.annotations.length);
+        redraw();
+        alert("Annotations imported!");
+    };
+    fileInput.click();
+}
+
+        function updateBrightnessRange() {
+            let min = parseInt(brightnessMin.value);
+            let max = parseInt(brightnessMax.value);
+            
+            // Ensure min < max and validate reasonable range
+            if (min >= max) {
+                min = max - 1;
+                brightnessMin.value = min;
+            }
+            
+            brightness.min = min;
+            brightness.max = max;
+            
+            // Ensure current value stays within new range
+            let current = parseInt(brightness.value);
+            if (current < min) brightness.value = min;
+            if (current > max) brightness.value = max;
+            
+            redraw();
+        }
+        function clearAnnotations() {
+        const confirmClear = confirm('Are you sure you want to remove all annotations? This cannot be undone!');
+        if (!confirmClear) return;
+        
+        state.annotations = [];
+        localStorage.removeItem('annotations'); // Clear any saved annotations
+        document.getElementById('last-annotated-diameter').textContent = '0';
+        updateCellCounts(0);
+        redraw();
+    }
+        function updateContrastRange() {
+            let min = parseInt(contrastMin.value);
+            let max = parseInt(contrastMax.value);
+            
+            if (min >= max) {
+                min = max - 1;
+                contrastMin.value = min;
+            }
+            
+            contrast.min = min;
+            contrast.max = max;
+            
+            let current = parseInt(contrast.value);
+            if (current < min) contrast.value = min;
+            if (current > max) contrast.value = max;
+            
+            redraw();
+        }
+        document.getElementById('scale-btn').addEventListener('click', scaleImage);
+
+//annotated cell diameter function
+function updateLastAnnotationDiameter() {
+    if (state.annotations.length === 0) {
+        document.getElementById('last-annotated-diameter').textContent = '0';
+        return;
+    }
+    
+    // Get last annotation
+    const lastAnn = state.annotations[state.annotations.length - 1];
+    // Calculate diagonal as diameter approximation
+    const diameter = Math.round(Math.sqrt(lastAnn.width ** 2 + lastAnn.height ** 2));
+    document.getElementById('last-annotated-diameter').textContent = diameter;
+}
+document.getElementById('complete-polygon-btn').addEventListener('click', () => {
+    if (state.currentPolygon && state.currentPolygon.points.length >= 3) {
+        state.annotations.push(state.currentPolygon);
+        state.currentPolygon = null;
+        updateCellCounts();
+        redraw();
+    }
+});
+
+document.getElementById('cancel-polygon-btn').addEventListener('click', () => {
+    state.currentPolygon = null;
+    redraw();
+});
+document.getElementById('show-metrics-btn').addEventListener('click', async () => {
+    try {
+        // Show modal
+        const modal = document.getElementById('metrics-modal');
+        modal.style.display = 'block';
+        
+        // Clear previous charts
+        const container = document.getElementById('charts-container');
+        container.innerHTML = '';
+
+        const res = await axios.get('/events-data');
+        const data = res.data;
+
+        // Create color palette for metrics
+        const colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+            '#9966FF', '#FF9F40', '#8AC926', '#1982C4'
+        ];
+        
+        let colorIndex = 0;
+        
+        // Create a single chart with all metrics
+        const chartDiv = document.createElement('div');
+        chartDiv.style.width = '100%';
+        chartDiv.style.height = '500px';
+        
+        const canvas = document.createElement('canvas');
+        chartDiv.appendChild(canvas);
+        container.appendChild(chartDiv);
+        
+        // Get common steps (x-axis)
+        const steps = Object.values(data)[0].map(p => p.step);
+        
+        // Create datasets for each metric
+        const datasets = [];
+        Object.entries(data).forEach(([tag, points]) => {
+            datasets.push({
+                label: tag,
+                data: points.map(p => p.value),
+                borderColor: colors[colorIndex++ % colors.length],
+                backgroundColor: colors[colorIndex++ % colors.length] + '33',
+                fill: false,
+                tension: 0.2
+            });
+        });
+
+        new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: steps,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { 
+                        title: { 
+                            display: true, 
+                            text: 'Epoch' 
+                        } 
+                    },
+                    y: { 
+                        title: { 
+                            display: true, 
+                            text: 'Metric Value' 
+                        } 
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        alert('Failed to load metrics: ' + (err.response?.data?.error || err.message));
+    }
+});
+
+// Add close button handler
+document.getElementById('close-metrics-btn').addEventListener('click', () => {
+    document.getElementById('metrics-modal').style.display = 'none';
+});
+
+document.getElementById('detect-cd3-btn').addEventListener('click', detectCD3);
+
+async function detectCD3() {
+    const threshold = parseFloat(document.getElementById('detection-threshold').value);
+    
+    try {
+        const response = await axios.post('/detect-cd3', { threshold }, {
+            withCredentials: true
+        });
+
+        const yoloTxt = response.data.annotations;
+        const imgWidth = response.data.image_width;
+        const imgHeight = response.data.image_height;
+
+        state.annotations = [];
+        let importedCount = 0;
+
+        yoloTxt.split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const [clsStr, cxStr, cyStr, wStr, hStr] = line.trim().split(' ');
+            const cls = parseInt(clsStr);
+            const cx = parseFloat(cxStr) * imgWidth;
+            const cy = parseFloat(cyStr) * imgHeight;
+            const w = parseFloat(wStr) * imgWidth;
+            const h = parseFloat(hStr) * imgHeight;
+            const x1 = cx - w / 2;
+            const y1 = cy - h / 2;
+
+            state.annotations.push({
+                x: x1,
+                y: y1,
+                width: w,
+                height: h,
+                class: cls,
+                isDetected: true
+            });
+            importedCount++;
+        });
+
+        state.annotations = mergeOverlappingBoxes(state.annotations, overlap_factor, true);
+        updateCellCounts(state.annotations.length);
+        updateDetectedDiameter();
+        redraw();
+        alert(`Detected ${importedCount} CD3 objects!`);
+
+    } catch (error) {
+        alert('CD3 detection failed: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+
+// Add scaling function
+async function scaleImage() {
+    const diameter = parseFloat(document.getElementById('cell-diameter').value);
+    if (isNaN(diameter) || diameter <= 0) {
+        alert('Please enter a valid cell diameter');
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('diameter', diameter);
+        formData.append('original_filename', `${state.imageName}.${state.originalExtension}`);
+
+        const response = await axios.post('/scale-image', formData,{
+            withCredentials: true
+        });
+        
+        if (response.data.message) {
+            alert(response.data.message);
+            return;
+        }
+
+        // Update image
+        const img = new Image();
+        img.onload = () => {
+            const scalingFactor = response.data.scaling_factor;
+            
+            // Scale existing annotations
+            state.annotations.forEach(ann => {
+                ann.x *= scalingFactor;
+                ann.y *= scalingFactor;
+                ann.width *= scalingFactor;
+                ann.height *= scalingFactor;
+            });
+            
+            // Update dimensions
+            state.naturalSize.width = response.data.new_width;
+            state.naturalSize.height = response.data.new_height;
+            canvas.width = state.naturalSize.width;
+            canvas.height = state.naturalSize.height;
+            
+            state.image = img;
+            redraw();
+        };
+        img.src = response.data.converted_url;
+
+    } catch (error) {
+        alert('Scaling failed: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+document.getElementById('detect-finetuned-btn').addEventListener('click', detectFinetuned);
+
+async function detectFinetuned() {
+    try {
+        // Get selected model type from dropdown
+        const modelType = document.getElementById('model-type-select').value;
+
+        // Call backend with model type
+        const response = await axios.post('/detect-finetuned', 
+            { model_type: modelType },  // Send model type to backend
+            { withCredentials: true }
+        );
+
+        state.annotations = []; // clear annotations before processing
+        
+        // 2. Process CSV data (SAME AS CUSTOM DETECTION)
+        const csvData = response.data.annotations;
+        const lines = csvData.split('\n');
+        
+        
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            const [filename, x1, y1, x2, y2, className] = line.split(',');
+            
+            // Convert coordinates
+            const x1_num = parseFloat(x1);
+            const y1_num = parseFloat(y1);
+            const x2_num = parseFloat(x2);
+            const y2_num = parseFloat(y2);
+            const [x1_final, y1_final, x2_final, y2_final] = sanitizeBox(x1_num, y1_num, x2_num, y2_num);
+
+            // Find class index
+            const classIndex = CLASS_NAMES.indexOf(className.trim());
+            if (classIndex === -1) return;
+
+            // Add annotation
+            state.annotations.push({
+                x: x1_final,
+                y: y1_final,
+                width: x2_final - x1_final,
+                height: y2_final - y1_final,
+                class: classIndex,
+                isDetected: true
+            });
+        });
+
+        // 3. Update display
+        state.annotations = mergeOverlappingBoxes(state.annotations, 0.3, true);
+        updateCellCounts(state.annotations.length);
+        updateDetectedDiameter();
+        redraw();
+        alert(`Detected ${state.annotations.length} objects!`);
+
+    } catch (error) {
+        alert('Detection failed: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+document.getElementById('batch-btn').addEventListener('click', () => {
+    document.getElementById('batch-modal').style.display = 'block';
+});
+
+document.getElementById('detection-type').addEventListener('change', function(e) {
+    document.getElementById('custom-model-ui').style.display = 
+        e.target.value === 'custom' ? 'block' : 'none';
+});
+
+document.getElementById('batch-files').addEventListener('change', function(e) {
+    document.getElementById('file-count').textContent = 
+        `${e.target.files.length} files selected`;
+});
+
+document.getElementById('start-batch').addEventListener('click', async () => {
+    const files = document.getElementById('batch-files').files;
+    if (files.length === 0) return alert('Please select images!');
+    
+    const formData = new FormData();
+    formData.append('detection_type', document.getElementById('detection-type').value);
+    formData.append('threshold', document.getElementById('batch-threshold').value);
+    formData.append('cell_diameter', document.getElementById('batch-cell-diameter').value);
+    
+    Array.from(files).forEach(file => formData.append('images', file));
+    
+    if (document.getElementById('detection-type').value === 'custom') {
+        const model = document.getElementById('custom-model').files[0];
+        if (!model) return alert('Please select a model!');
+        formData.append('custom_model', model);
+        formData.append('class_type', 
+        document.getElementById('custom-class-type').value);
+    }
+    
+    try {
+        const response = await axios.post('/batch-detect', formData, {
+            headers: {'Content-Type': 'multipart/form-data'},
+            responseType: 'blob',
+            withCredentials: true
+        });
+        
+        // Download ZIP
+        const url = window.URL.createObjectURL(response.data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'batch_results.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        document.getElementById('batch-modal').style.display = 'none';
+    } catch (error) {
+        alert(`Error: ${error.response?.data?.error || error.message}`);
+    }
+});
+
+
+        // CUSTOM DETECTION CODE
+        document.getElementById('custom-detect-btn').addEventListener('click', () => {
+            document.getElementById('custom-detect-modal').style.display = 'block';
+        });
+
+        document.getElementById('custom-model-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            document.getElementById('selected-model-name').textContent = file ? file.name : 'No file selected';
+        });
+
+        document.getElementById('run-custom-detect').addEventListener('click', async () => {
+            try {
+                const modelType = document.getElementById('custom-model-type').value;
+                const modelFile = document.getElementById('custom-model-file').files[0];
+                const threshold = document.getElementById('custom-threshold').value;
+                
+                const formData = new FormData();
+                formData.append('model_type', modelType);
+                formData.append('pt_file', modelFile);  // Changed from h5_file
+                formData.append('threshold', threshold);  // Add threshold
+                
+                const response = await axios.post('/detect-custom', formData, {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                    withCredentials: true
+                });
+                
+
+
+                // Process CSV data
+                const csvData = response.data.annotations;
+                    const lines = csvData.split('\n');
+                    
+                    state.annotations = [];
+                    let importedCount = 0;
+
+                    lines.forEach(line => {
+                        if (!line.trim()) return;
+                        const [filename, x1Str, y1Str, x2Str, y2Str, className] = line.split(',');  // Same as import
+                        
+                        // Identical coordinate handling
+                        let x1 = parseFloat(x1Str);
+                        let y1 = parseFloat(y1Str);
+                        let x2 = parseFloat(x2Str);
+                        let y2 = parseFloat(y2Str);
+                        [x1, y1, x2, y2] = sanitizeBox(x1, y1, x2, y2);
+
+                        const classIndex = CLASS_NAMES.indexOf(className.trim());
+                        if (classIndex === -1) return;
+
+                        state.annotations.push({
+                            x: x1,
+                            y: y1,
+                            width: x2 - x1,
+                            height: y2 - y1,
+                            class: classIndex,
+                            isDetected: true
+                        });
+                        importedCount++;
+                    });
+                        // Merge overlapping boxes before updating state
+
+                        state.annotations = mergeOverlappingBoxes(state.annotations, overlap_factor, true);
+                        importedCount = state.annotations.length;
+
+                    updateCellCounts(importedCount);
+                    redraw();
+                    alert(`Successfully detected ${importedCount} objects!`);
+
+                } catch (error) {
+                console.error('Custom detection error:', error);
+                alert('Detection failed: ' + (error.response?.data?.error || error.message));
+            }
+        });
+
+        function updateDetectedDiameter() {
+        if (state.annotations.length === 0) {
+            document.getElementById('cell-diameter-display').textContent = '0';
+            return;
+        }
+
+        // Calculate average of all annotation dimensions
+        let total = 0;
+        state.annotations.forEach(ann => {
+            total += Math.sqrt(ann.width ** 2 + ann.height ** 2); //diagonal calculation
+        });
+        const avgDiameter = Math.round(total / state.annotations.length);
+        
+        document.getElementById('cell-diameter-display').textContent = avgDiameter;
+        
+
+    }
+
+        // NEW: Coordinate sanitization utility
+        function sanitizeBox(x1, y1, x2, y2) {
+            // Ensure x1 <= x2 and y1 <= y2
+            const newX1 = Math.min(x1, x2);
+            const newY1 = Math.min(y1, y2);
+            const newX2 = Math.max(x1, x2);
+            const newY2 = Math.max(y1, y2);
+            return [newX1, newY1, newX2, newY2];
+        }
+        // Calculate Intersection over Union (IoU) between two boxes
+        function calculateIoU(boxA, boxB) {
+            const xA = Math.max(boxA.x, boxB.x);
+            const yA = Math.max(boxA.y, boxB.y);
+            const xB = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
+            const yB = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
+            const interArea = Math.max(0, xB - xA) * Math.max(0, yB - yA);
+            const boxAArea = boxA.width * boxA.height;
+            const boxBArea = boxB.width * boxB.height;
+            return interArea / (boxAArea + boxBArea - interArea);
+        }
+
+        // Merge overlapping boxes using DBSCAN clustering
+        function mergeOverlappingBoxes(annotations, iouThreshold = 0.3, multiClass = false) {
+    const merged = [];
+    
+    // Group annotations by class if multiClass is true
+    const classGroups = multiClass ? 
+        Object.groupBy(annotations, a => a.class) :
+        { all: annotations };
+
+    for (const [classKey, group] of Object.entries(classGroups)) {
+        const classMerged = [];
+        const visited = new Array(group.length).fill(false);
+        
+        group.forEach((ann, index) => {
+            if (!visited[index]) {
+                visited[index] = true;
+                const cluster = [ann];
+                
+                let queue = [ann];
+                while (queue.length > 0) {
+                    const current = queue.shift();
+                    group.forEach((other, otherIndex) => {
+                        if (!visited[otherIndex] && 
+                            calculateIoU(current, other) > iouThreshold) {
+                            visited[otherIndex] = true;
+                            cluster.push(other);
+                            queue.push(other);
+                        }
+                    });
+                }
+                
+                const x1 = Math.min(...cluster.map(b => b.x));
+                const y1 = Math.min(...cluster.map(b => b.y));
+                const x2 = Math.max(...cluster.map(b => b.x + b.width));
+                const y2 = Math.max(...cluster.map(b => b.y + b.height));
+                
+                classMerged.push({
+                    x: x1,
+                    y: y1,
+                    width: x2 - x1,
+                    height: y2 - y1,
+                    class: ann.class, // Preserve original class
+                    isDetected: true
+                });
+            }
+        });
+        
+        merged.push(...classMerged);
+    }
+    
+    return merged;
+}
+        // Handle saved data training
+
+window.startSavedTraining = async function() {
+    try {
+        let numImages = parseInt(document.getElementById('num-images').value);
+        if (isNaN(numImages)) {
+            alert('Invalid number of images! Using default 7.');
+            numImages = 7;
+        }
+
+        const modelType = document.getElementById('saved-model-type').value;
+        const epochs = document.getElementById('saved-epochs').value;
+
+        if (!epochs || epochs < 1) {
+            alert('Please enter valid number of epochs!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('model_type', modelType);
+        formData.append('epochs', epochs);
+        formData.append('num_images', numImages);
+
+        const response = await axios.post('/train-saved', formData, {
+            withCredentials: true
+        });
+
+        // 🎯 Show metrics modal
+        const modal = document.getElementById('metrics-modal');
+        modal.style.display = 'block';
+
+        const container = document.getElementById('charts-container');
+        container.innerHTML = '';
+
+        // 🎯 Show K-Fold results
+        const resultDiv = document.createElement('div');
+        resultDiv.style.whiteSpace = 'pre-wrap';
+        resultDiv.style.background = '#fff';
+        resultDiv.style.border = '1px solid #ccc';
+        resultDiv.style.padding = '15px';
+        resultDiv.style.marginTop = '10px';
+        resultDiv.style.borderRadius = '6px';
+        resultDiv.style.fontFamily = 'monospace';
+        resultDiv.textContent = response.data.kfold_results || 'No K-Fold results available.';
+        container.appendChild(resultDiv);
+
+        // 🎯 Download link (optional)
+        const downloadLink = document.createElement('a');
+        downloadLink.href = response.data.model_url;
+        downloadLink.textContent = 'Download Trained Model (.pt)';
+        downloadLink.className = 'btn';
+        downloadLink.style.display = 'inline-block';
+        downloadLink.style.marginTop = '15px';
+        downloadLink.download = true;
+        container.appendChild(downloadLink);
+
+        document.getElementById('saved-train-modal').style.display = 'none';
+    } catch (error) {
+        alert('Training failed: ' + (error.response?.data?.error || error.message));
+    }
+};
+
+
+
+            document.getElementById('detect-madm-btn').addEventListener('click', detectMADM);
+
+async function detectMADM() {
+    const threshold = parseFloat(document.getElementById('detection-threshold').value);
+    
+    try {
+        const response = await axios.post('/detect-madm', { threshold }, {
+            withCredentials: true
+        });
+
+        const yoloTxt = response.data.annotations;
+        const imgWidth = response.data.image_width;
+        const imgHeight = response.data.image_height;
+
+        state.annotations = [];
+        let importedCount = 0;
+
+        yoloTxt.split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const [clsStr, cxStr, cyStr, wStr, hStr] = line.trim().split(' ');
+            const cls = parseInt(clsStr);
+            const cx = parseFloat(cxStr) * imgWidth;
+            const cy = parseFloat(cyStr) * imgHeight;
+            const w = parseFloat(wStr) * imgWidth;
+            const h = parseFloat(hStr) * imgHeight;
+            const x1 = cx - w / 2;
+            const y1 = cy - h / 2;
+
+            state.annotations.push({
+                x: x1,
+                y: y1,
+                width: w,
+                height: h,
+                class: cls,
+                isDetected: true
+            });
+            importedCount++;
+        });
+
+        state.annotations = mergeOverlappingBoxes(state.annotations, overlap_factor, true);
+        updateCellCounts(state.annotations.length);
+        updateDetectedDiameter();
+        redraw();
+        alert(`Detected ${importedCount} MADM objects!`);
+
+    } catch (error) {
+        alert('Detection failed: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+
+
+            document.getElementById('clear-training-data-btn').addEventListener('click', clearTrainingData);
+
+            async function clearTrainingData() {
+                try {
+                    const confirm = window.confirm('Are you sure you want to delete all training data? This cannot be undone!');
+                    if (!confirm) return;
+
+                    await axios.post('/clear-training-data', {}, {
+                        withCredentials: true 
+                    });
+                    alert('All training data has been cleared!');
+                } catch (error) {
+                    alert('Error clearing training data: ' + error.message);
+                }
+            }
+
+            document.getElementById('save-training-data-btn').addEventListener('click', saveTrainingData);
+
+async function saveTrainingData() {
+    if (!state.image) {
+        alert('Please load an image first!');
+        return;
+    }
+
+    try {
+        // Prepare YOLO format data with rounded decimals
+        const annotations = state.annotations.map(ann => {
+            const x_center = roundTo6((ann.x + ann.width/2) / state.naturalSize.width);
+            const y_center = roundTo6((ann.y + ann.height/2) / state.naturalSize.height);
+            const width_norm = roundTo6(ann.width / state.naturalSize.width);
+            const height_norm = roundTo6(ann.height / state.naturalSize.height);
+            const class_name = CLASS_NAMES[ann.class];
+            
+            return {
+                x_center,
+                y_center,
+                width_norm,
+                height_norm,
+                class_name
+            };
+        });
+
+        // Helper function to round to 6 decimal places
+        function roundTo6(num) {
+            return parseFloat(num.toFixed(6));
+        }
+
+        const data = {
+            original_filename: `${state.imageName}.${state.originalExtension}`,
+            annotations: annotations,
+            brightness: brightness.value,
+            contrast: contrast.value
+        };
+
+        const response = await axios.post('/save-training-data', data, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            withCredentials: true
+        });
+
+        alert('Training data saved successfully with clean formatting!');
+    } catch (error) {
+        console.error('Error saving training data:', error);
+        alert('Error saving training data: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+
+
+
+            document.getElementById('detect-sgn-btn').addEventListener('click', detectSGN);
+
+async function detectSGN() {
+    const threshold = parseFloat(document.getElementById('detection-threshold').value);
+    if (isNaN(threshold) || threshold < 0 || threshold > 1) {
+        alert('Please enter a valid threshold between 0 and 1!');
+        return;
+    }
+
+    try {
+        const response = await axios.post('/detect-sgn', { threshold }, {
+            withCredentials: true
+        });
+
+        const yoloTxt = response.data.annotations;
+        const imgWidth = response.data.image_width;
+        const imgHeight = response.data.image_height;
+
+        state.annotations = [];
+        let importedCount = 0;
+
+        yoloTxt.split('\n').forEach(line => {
+            if (!line.trim()) return;
+            const [clsStr, cxStr, cyStr, wStr, hStr] = line.trim().split(' ');
+            const cls = parseInt(clsStr);
+            const cx = parseFloat(cxStr) * imgWidth;
+            const cy = parseFloat(cyStr) * imgHeight;
+            const w = parseFloat(wStr) * imgWidth;
+            const h = parseFloat(hStr) * imgHeight;
+            const x1 = cx - w / 2;
+            const y1 = cy - h / 2;
+
+            state.annotations.push({
+                x: x1,
+                y: y1,
+                width: w,
+                height: h,
+                class: cls,
+                isDetected: true
+            });
+            importedCount++;
+        });
+
+        state.annotations = mergeOverlappingBoxes(state.annotations, overlap_factor, true);
+        updateCellCounts(state.annotations.length);
+        updateDetectedDiameter();
+        redraw();
+        alert(`Detected ${importedCount} SGN objects!`);
+
+    } catch (error) {
+        alert('Detection failed: ' + (error.response?.data?.error || error.message));
+    }
+}
+
+async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if the file has a .tiff or .tif extension
+    if (!file.name.toLowerCase().endsWith('.tiff') && !file.name.toLowerCase().endsWith('.tif')) {
+        alert('Only .tiff and .tif files are accepted.');
+        e.target.value = ''; // Clear the file input
+        return;
+    }
+
+    // Proceed with uploading the valid file
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            withCredentials: true
+        });
+
+        const data = response.data;
+        document.getElementById('current-image-display').textContent = data.original_name;
+
+        // Update state with original file information
+        state.imageName = data.base_name;
+        state.originalExtension = data.original_extension;
+
+        // Load the converted PNG image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            state.image = img;
+            state.naturalSize = {
+                width: img.width,
+                height: img.height
+            };
+
+            // Reset annotations and related data
+            state.annotations = [];  // Clear previous annotations
+            updateCellCounts(0);    // Reset cell count to 0
+
+            // Set canvas size to match the new image
+            canvas.width = state.naturalSize.width;
+            canvas.height = state.naturalSize.height;
+
+            // Reset all parameters to default
+            // Brightness/Contrast
+            brightnessMin.value = -100;
+            brightnessMax.value = 100;
+            brightness.value = 0;
+            contrastMin.value = -100;
+            contrastMax.value = 100;
+            contrast.value = 0;
+            updateBrightnessRange();
+            updateContrastRange();
+
+            // Detection parameters
+            document.getElementById('cell-diameter').value = 34;
+            document.getElementById('detection-threshold').value = 0.5;
+
+            // Show canvas and hide placeholder
+            canvas.style.display = 'block';
+            document.querySelector('.canvas-container').classList.add('has-image');
+
+            // Reset view and redraw the canvas
+            resetView();
+            redraw();
+            // Reset scroll position to show top-left of image
+            const container = document.querySelector('.canvas-container');
+            container.scrollLeft = 0;
+            container.scrollTop = 0;
+        };
+        img.src = data.converted_url;
+
+    } catch (error) {
+        alert('Error uploading file: ' + error.message);
+    }
+}
+        function updateCellCounts(importedCount) {
+            if (importedCount !== undefined) {
+                importedCellCount.textContent = importedCount;
+            }
+            currentCellCount.textContent = state.annotations.length;
+        }
+
+            function loadTiffImage(buffer) {
+                const tiff = new Tiff({ buffer });
+                const img = tiff.toCanvas();
+                initializeImageState(img);
+            }
+
+            function loadRegularImage(src) {
+                const img = new Image();
+                img.onload = () => initializeImageState(img);
+                img.src = src;
+            }
+
+            function initializeImageState(img) {
+                state.image = img;
+                state.naturalSize = {
+                    width: img.width || img.naturalWidth,
+                    height: img.height || img.naturalHeight
+                };
+                canvas.width = state.naturalSize.width;
+                canvas.height = state.naturalSize.height;
+                resetView();
+                redraw();
+            }
+
+            function resetView() {
+                state.scale = 1;
+            state.offsetX = 0;
+            state.offsetY = 0;
+            brightness.value = 0;
+            contrast.value = 0;
+            // Reset scroll position
+            const container = document.querySelector('.canvas-container');
+            container.scrollLeft = 0;
+            container.scrollTop = 0;
+                // Show canvas if image exists
+            if (state.image) {
+                canvas.style.display = 'block';
+                document.querySelector('.canvas-container').classList.add('has-image');
+            }
+            // Reset to default range if desired
+            // brightnessMin.value = -100;
+            // brightnessMax.value = 100;
+            // contrastMin.value = -100;
+            // contrastMax.value = 100;
+            // updateBrightnessRange();
+            // updateContrastRange();
+            }
+
+function redraw() {
+    // Clear canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw image with filters
+    ctx.save();
+    ctx.setTransform(state.scale, 0, 0, state.scale, state.offsetX, state.offsetY);
+    ctx.filter = `brightness(${100 + +brightness.value}%) contrast(${100 + +contrast.value}%)`;
+    ctx.drawImage(state.image, 0, 0, state.naturalSize.width, state.naturalSize.height);
+    ctx.restore();
+
+    // Draw all completed polygons
+    ctx.save();
+    ctx.setTransform(state.scale, 0, 0, state.scale, state.offsetX, state.offsetY);
+    ctx.filter = 'none';
+    
+    state.annotations.forEach(polygon => {
+        drawPolygon(polygon, false);
+    });
+
+    // Draw current polygon being created
+    if (state.currentPolygon) {
+        drawPolygon(state.currentPolygon, true);
+    }
+
+    ctx.restore();
+}
+
+function drawPolygon(polygon, isCurrent) {
+    if (polygon.points.length < 1) return;
+    
+    const color = getClassColor(polygon.class);
+    
+    // Draw filled polygon
+    ctx.fillStyle = hexToRGBA(color, 0.3);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2 / state.scale;
+    ctx.setLineDash(isCurrent ? [5, 5] : []);
+
+    ctx.beginPath();
+    ctx.moveTo(polygon.points[0].x, polygon.points[0].y);
+    for (let i = 1; i < polygon.points.length; i++) {
+        ctx.lineTo(polygon.points[i].x, polygon.points[i].y);
+    }
+    
+    // For complete polygons, close the path
+    if (!isCurrent && polygon.points.length > 2) {
+        ctx.closePath();
+    }
+    
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw points
+    ctx.fillStyle = color;
+    polygon.points.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 4 / state.scale, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Draw connecting line for current polygon
+    if (isCurrent && polygon.points.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(
+            polygon.points[polygon.points.length-1].x,
+            polygon.points[polygon.points.length-1].y
+        );
+        ctx.lineTo(
+            (lastX - state.offsetX) / state.scale,
+            (lastY - state.offsetY) / state.scale
+        );
+        ctx.stroke();
+    }
+}
+
+            // Coordinate Transformation
+            function getTransformedPoint(x, y) {
+                return {
+                    x: (x - state.offsetX) / state.scale,
+                    y: (y - state.offsetY) / state.scale
+                };
+            }
+
+            // Mouse Handlers
+            let lastX = 0, lastY = 0, startX = 0, startY = 0;
+
+function handleMouseDown(e) {
+    if (!state.image) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const { x, y } = getTransformedPoint(e.clientX - rect.left, e.clientY - rect.top);
+
+    // Right click - delete polygon
+    if (e.button === 2) {
+        const clickedPolygonIndex = findPolygonAtPoint(x, y);
+        if (clickedPolygonIndex !== -1) {
+            state.annotations.splice(clickedPolygonIndex, 1);
+            updateCellCounts();
+            redraw();
+        }
+        return;
+    }
+
+    // Left click - add point or start new polygon
+    if (state.editingPolygon !== null) {
+        // Add point to polygon being edited
+        state.editingPolygon.points.push({x, y});
+    } else if (state.currentPolygon) {
+        // Add point to current polygon
+        state.currentPolygon.points.push({x, y});
+    } else {
+        // Start new polygon
+        state.currentPolygon = {
+            points: [{x, y}],
+            class: state.currentClass
+        };
+    }
+    redraw();
+}
+function handleMouseMove(e) {
+    if (!state.image) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+
+    // Just redraw for live preview
+    redraw();
+}
+
+function findPolygonAtPoint(x, y) {
+    const hitRadius = 8 / state.scale; // Pixel tolerance for clicking
+    
+    for (let i = state.annotations.length - 1; i >= 0; i--) {
+        const polygon = state.annotations[i];
+        for (const point of polygon.points) {
+            if (Math.sqrt((point.x - x)**2 + (point.y - y)**2) < hitRadius) {
+                return i;
+            }
+        }
+        
+        // Check if click was inside the polygon
+        if (isPointInPolygon({x, y}, polygon.points)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Ray casting algorithm for point-in-polygon test
+function isPointInPolygon(point, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].x, yi = polygon[i].y;
+        const xj = polygon[j].x, yj = polygon[j].y;
+        
+        const intersect = ((yi > point.y) !== (yj > point.y))
+            && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+            function handleMouseUp(e) {
+            if (state.panStart) {
+                state.panStart = null;
+                return;
+            }
+
+            const { x, y } = getTransformedPoint(lastX, lastY);
+            const [x1, y1, x2, y2] = sanitizeBox(startX, startY, x, y);
+            
+            if (state.isCropping) {
+                cropImage(x1, y1, x2 - x1, y2 - y1);
+                state.isCropping = false;
+                state.isCropStarted = false; // Reset flag
+                document.getElementById('crop-btn').classList.remove('active');
+            } else if (state.isDrawing) {
+                state.annotations.push({
+                    x: x1,
+                    y: y1,
+                    width: x2 - x1,
+                    height: y2 - y1,
+                    class: state.currentClass
+                });
+                updateCellCounts();
+                updateLastAnnotationDiameter();
+                state.isDrawing = false;
+            }
+            
+            redraw();
+        }
+            function handleWheel(e) {
+                if (!state.isZoomMode) return;
+                
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                const { x, y } = getTransformedPoint(e.offsetX, e.offsetY);
+                
+                state.scale *= delta;
+                state.scale = Math.min(Math.max(0.1, state.scale), 10);
+                state.offsetX = e.offsetX - x * state.scale;
+                state.offsetY = e.offsetY - y * state.scale;
+                
+                redraw();
+            }
+
+            function handleRightClick(e) {
+                e.preventDefault();
+                const { x, y } = getTransformedPoint(e.offsetX, e.offsetY);
+                
+                state.annotations = state.annotations.filter(ann => 
+                    !(x >= ann.x && x <= ann.x + ann.width &&
+                      y >= ann.y && y <= ann.y + ann.height)
+                );
+                updateCellCounts();
+                redraw();
+            }
+
+            // Annotation Operations
+async function exportAnnotations() {
+    if (!state.image) {
+        alert("No image loaded.");
+        return;
+    }
+
+    const width = state.naturalSize.width;
+    const height = state.naturalSize.height;
+
+    // Format annotations as YOLO segmentation
+    const lines = state.annotations.map(polygon => {
+        const classId = polygon.class;
+        const normalizedPoints = polygon.points.map(pt => 
+            [pt.x / width, pt.y / height]
+        ).flat();
+        return [classId, ...normalizedPoints].join(' ');
+    });
+
+    if (lines.length === 0) {
+        alert("No polygon annotations to export.");
+        return;
+    }
+
+    try {
+        const response = await axios.post('/export-annotations', {
+            yolo_data: lines.join('\n'),
+            original_filename: `${state.imageName}.${state.originalExtension}`
+        }, {
+            responseType: 'blob',
+            withCredentials: true
+        });
+
+        const url = URL.createObjectURL(response.data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'annotations.zip';
+        a.click();
+        
+    } catch (err) {
+        alert('Export failed: ' + (err.response?.data?.error || err.message));
+    }
+}
+
+
+    function saveImage() {
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Set to original image dimensions
+    tempCanvas.width = state.naturalSize.width;
+    tempCanvas.height = state.naturalSize.height;
+
+    // Apply current brightness/contrast
+    tempCtx.filter = `brightness(${100 + parseInt(brightness.value)}%) 
+                      contrast(${100 + parseInt(contrast.value)}%)`;
+    
+    // Draw base image with filters
+    tempCtx.drawImage(state.image, 0, 0, state.naturalSize.width, state.naturalSize.height);
+    
+    // Reset filter for annotations
+    tempCtx.filter = 'none';
+    
+    // Draw annotations with both fill and stroke
+    state.annotations.forEach(ann => {
+        // Draw semi-transparent fill
+        tempCtx.fillStyle = hexToRGBA(getClassColor(ann.class), 0.3);
+        tempCtx.fillRect(ann.x, ann.y, ann.width, ann.height);
+
+        // Draw border with appropriate style
+        tempCtx.strokeStyle = getClassColor(ann.class);
+        tempCtx.lineWidth = 2;
+        if (ann.isDetected) {
+            tempCtx.setLineDash([5, 5]);  // Dashed line for detected annotations
+        } else {
+            tempCtx.setLineDash([]);      // Solid line for manual annotations
+        }
+        tempCtx.strokeRect(ann.x, ann.y, ann.width, ann.height);
+    });
+
+    // Create download link
+    const link = document.createElement('a');
+    link.href = tempCanvas.toDataURL('image/png');
+    link.download = `annotated_${state.imageName}.png`;
+    link.click();
+}
+function hexToRGBA(hex, alpha) {
+    // Remove the '#' if present
+    hex = hex.replace('#', '');
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+async function persistCropOnServer(origX, origY, origW, origH) {
+  const fd = new FormData();
+  fd.append('original_filename', `${state.imageName}.${state.originalExtension}`);
+  fd.append('x', origX);
+  fd.append('y', origY);
+  fd.append('width', origW);
+  fd.append('height', origH);
+  await axios.post('/upload-cropped', fd, { withCredentials: true });
+}
+
+// Image Operations
+  async function cropImage(x, y, width, height) {
+    // 1) Make sure we’re using the un‑transformed source image
+    const src = state.image;
+    if (!src) return alert('Load an image first!');
+
+    // 2) Create a temporary canvas the size of the selection
+    const tmp = document.createElement('canvas');
+    tmp.width  = width;
+    tmp.height = height;
+    const tctx = tmp.getContext('2d');
+
+    const origX      = Math.round(x);
+    const origY      = Math.round(y);
+    const origWidth  = Math.round(width);
+    const origHeight = Math.round(height);
+
+    // 2) Tell the server to crop its TIFF to exactly that box
+    await persistCropOnServer(origX, origY, origWidth, origHeight);
+
+    // 3) Draw exactly the rectangle you dragged from the SOURCE image
+    //    (src is state.image, which is at full natural size)
+    tctx.drawImage(
+      src,
+      x, y, width, height,  // from src-image coords
+      0, 0, width, height   // onto tmp at (0,0)
+
+      
+    );
+
+    // 4) Now replace your onscreen canvas with that cropped result
+    canvas.width  = width;
+    canvas.height = height;
+    // reset any zoom/pan
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(tmp, 0, 0);
+
+    // 5) Update state.image to the cropped image so the rest of your code still works
+    state.image = new Image();
+    state.image.onload = () => {
+      state.naturalSize = { width, height };
+      state.offsetX = state.offsetY = 0;
+      state.scale    = 1;
+      redraw();  // redraw annotations/etc if needed
+    };
+    state.image.src = tmp.toDataURL();
+  }
+
+            // UI Toggles
+            function toggleCropping() {
+                state.isCropping = !state.isCropping;
+                this.classList.toggle('active', state.isCropping);
+            }
+
+            function toggleZoom() {
+                state.isZoomMode = !state.isZoomMode;
+                this.classList.toggle('active', state.isZoomMode);
+            }
+        });
+    </script>
+    <div id="train-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; z-index: 1000;">
+        <h3>Training Setup</h3>
+        
+        <select id="model-type" class="btn">
+            <option value="SGN">SGN</option>
+            <option value="MADM">MADM</option>
+            <option value="MADM">CD3</option>
+        </select>
+        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+            <label for="epochs" style="white-space: nowrap;">Epochs:</label>
+            <input type="number" id="epochs" class="btn" 
+                   value="10" min="1" style="flex: 1;">
+        </div>
+        <button class="btn" onclick="document.getElementById('train-csv').click()">Upload CSV</button>
+        <input type="file" id="train-csv" hidden accept=".csv">
+        
+        <button class="btn" onclick="document.getElementById('train-images').click()">Upload Images</button>
+        <input type="file" id="train-images" hidden multiple accept="image/*">
+        
+        <button class="btn" onclick="startTraining()">Start Training</button>
+        <button class="btn" onclick="document.getElementById('train-modal').style.display = 'none'">Close</button>
+    </div>
+    <script>
+        let trainingFiles = {
+    csv: null,
+    images: []
+};
+
+// File handlers
+document.getElementById('train-csv').addEventListener('change', function(e) {
+    trainingFiles.csv = e.target.files[0];
+});
+document.getElementById('train-images').addEventListener('change', function(e) {
+    trainingFiles.images = Array.from(e.target.files);
+});
+
+// Training function
+window.startSavedTraining = async function() {
+    try {
+        let numImages = parseInt(document.getElementById('num-images').value);
+        if (isNaN(numImages)) {
+            alert('Invalid number of images! Using default 7.');
+            numImages = 7;
+        }
+        const modelType = document.getElementById('saved-model-type').value;
+        const epochs = document.getElementById('saved-epochs').value;
+
+        if (!epochs || epochs < 1) {
+            alert('Please enter valid number of epochs!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('model_type', modelType);
+        formData.append('epochs', epochs);
+        formData.append('num_images', numImages);
+
+        const response = await axios.post('/train-saved', formData, {
+            withCredentials: true
+        });
+
+        // Show metrics modal
+        const modal = document.getElementById('metrics-modal');
+        modal.style.display = 'block';
+
+        const container = document.getElementById('charts-container');
+        container.innerHTML = '';
+
+        // Show K-Fold results
+        const resultDiv = document.createElement('div');
+        resultDiv.style.whiteSpace = 'pre-wrap';
+        resultDiv.style.background = '#fff';
+        resultDiv.style.border = '1px solid #ccc';
+        resultDiv.style.padding = '15px';
+        resultDiv.style.marginTop = '10px';
+        resultDiv.style.borderRadius = '6px';
+        resultDiv.style.fontFamily = 'monospace';
+        resultDiv.textContent = response.data.kfold_results || 'No K-Fold results available.';
+        container.appendChild(resultDiv);
+
+        // Optional: download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = response.data.model_url;
+        downloadLink.textContent = 'Download Trained Model (.pt)';
+        downloadLink.className = 'btn';
+        downloadLink.style.display = 'inline-block';
+        downloadLink.style.marginTop = '15px';
+        downloadLink.download = true;
+        container.appendChild(downloadLink);
+
+        document.getElementById('saved-train-modal').style.display = 'none';
+    } catch (error) {
+        alert('Training failed: ' + (error.response?.data?.error || error.message));
+    }
+};
+
+
+// Show modal
+document.getElementById('fine-tune-btn').addEventListener('click', () => {
+    document.getElementById('train-modal').style.display = 'block';
+});
+
+    </script>
+<div id="saved-train-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; z-index: 1000;">
+    <h3>Train with Saved Data</h3>
+    <div style="margin: 10px 0;">
+        <label for="num-images">Pre-train Images (0-7 for SGN) (0-278 for MADM):</label>
+        <input type="number" id="num-images" class="btn" 
+               value="7" min="0" max="7" style="width: 100%;">
+    </div>
+    <select id="saved-model-type" class="btn">
+        <option value="SGN">SGN</option>
+        <option value="MADM">MADM</option>
+        <option value="CD3">CD3</option> 
+    </select>
+    
+    <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+        <label for="saved-epochs" style="white-space: nowrap;">Epochs:</label>
+        <input type="number" id="saved-epochs" class="btn" 
+               value="10" min="1" style="flex: 1;">
+    </div>
+    
+    <button class="btn" onclick="startSavedTraining()">Start Training</button>
+    <button class="btn" onclick="document.getElementById('saved-train-modal').style.display = 'none'">
+        Close
+    </button>
+</div>
+<!-- ADD THIS CUSTOM DETECT MODAL -->
+<div id="custom-detect-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; z-index: 1000; border: 1px solid #ccc;">
+    <h3 style="margin-top: 0;">Custom Detection</h3>
+    
+    <div style="margin-bottom: 15px;">
+        <select id="custom-model-type" class="btn" style="width: 100%;">
+            <option value="SGN">SGN Model</option>
+            <option value="MADM">MADM Model</option>
+            <option value="CD3">CD3 Model</option>
+        </select>
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+        <label class="btn" style="display: block; background: #4CAF50; color: white;">
+            Upload Model (.pt)
+            <input type="file" id="custom-model-file" accept=".pt" hidden>
+        </label>
+        <div id="selected-model-name" style="margin-top: 5px; font-size: 0.9em;"></div>
+    </div>
+        <div style="margin-bottom: 15px;">
+        <label for="custom-threshold">Threshold (0-1):</label>
+        <input type="number" id="custom-threshold" value="0.5" step="0.1" min="0" max="1" 
+               class="btn" style="width: 100%;">
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" id="run-custom-detect" style="flex: 1;">Detect</button>
+        <button class="btn" onclick="document.getElementById('custom-detect-modal').style.display = 'none'" style="flex: 1; background: #666;">Close</button>
+    </div>
+</div>
+<!-- Batch Modal -->
+<div id="batch-modal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    min-width: 400px;
+">
+    <h3 style="margin-top: 0; color: #333;">Batch Processing</h3>
+    <input type="file" id="batch-files" multiple accept=".tiff,.tif" hidden>
+    <button class="btn" onclick="document.getElementById('batch-files').click()" 
+            style="margin-bottom: 15px;">
+        Select Images
+    </button>
+    <div id="file-count" style="margin-bottom: 15px; color: #666;">0 files selected</div>
+    
+    <select id="detection-type" class="btn" style="margin-bottom: 15px;">
+        <option value="SGN">Detect SGN</option>
+        <option value="MADM">Detect MADM</option>
+        <option value="CD3">Detect CD3</option>
+        <option value="custom">Custom Model</option>
+    </select>
+    
+    <div id="custom-model-ui" style="display: none; margin-bottom: 15px;">
+        <input type="file" id="custom-model" accept=".h5" hidden>
+        <button class="btn" onclick="document.getElementById('custom-model').click()">
+            Upload Model (.h5)
+        </button>
+    <!-- Add class type selection -->
+    <div style="margin-top: 10px;">
+        <label>Model Type:</label>
+        <select id="custom-class-type" class="btn" style="width: 100%; margin-top: 5px;">
+            <option value="SGN">SGN Class</option>
+            <option value="MADM">MADM Class</option>
+        </select>
+    </div>
+    </div>
+    <label for="batch-threshold" style="display: block; margin-bottom: 5px;">Detection Threshold (0-1):</label>
+    <input type="number" id="batch-threshold" value="0.5" step="0.1" min="0" max="1" 
+           class="btn" style="margin-bottom: 15px; width: 100%;">
+    
+    <div style="margin-bottom: 15px;">
+    <label for="batch-cell-diameter" style="display: block; margin-bottom: 5px;">Typical cell diameter in batch(px):</label>
+    <input type="number" id="batch-cell-diameter" class="btn" 
+            value="34" step="1" min="1" style="width: 100%;">
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" id="start-batch" 
+                style="flex: 1; background: #4CAF50;">Process</button>
+        <button class="btn" onclick="document.getElementById('batch-modal').style.display = 'none'" 
+                style="flex: 1; background: #f44336;">Cancel</button>
+    </div>
+</div>
+<!-- Metrics Modal -->
+<div id="metrics-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 90%; max-width: 800px; height: 80%; padding: 20px; overflow: auto; border-radius: 8px;">
+        <button style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 5px 10px;" id="close-metrics-btn">X</button>
+        <h2 style="margin-top: 0;">Training Metrics</h2>
+        <div id="charts-container" style="height: calc(100% - 40px);"></div>
+    </div>
+</div>
+</body>
+</html>
